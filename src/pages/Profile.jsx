@@ -14,11 +14,11 @@ function Profile() {
 
   const fetchUser = async () => {
     try {
-      const response = await axios.post(`http://localhost:9999/userProfile`, { userId });
+      const response = await axios.post(`https://vsee.onrender.com/userProfile`, { userId });
       setShowUser(response.data);
 
       if (response.data.Profile) {
-        setImage(`http://localhost:9999/${response.data.Profile}`);
+        setImage(`https://vsee.onrender.com/${response.data.Profile}`);
       } else {
         setImage(pro);
       }
@@ -56,7 +56,7 @@ function Profile() {
         formData.append('Profile', imageFile);
       }
 
-      const response = await axios.post(`http://localhost:9999/updateUser`, formData, {
+      const response = await axios.post(`https://vsee.onrender.com/updateUser`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -65,7 +65,7 @@ function Profile() {
       setShowUser(response.data);
 
       if (response.data.Profile) {
-        setImage(`http://localhost:9999/${response.data.Profile}`);
+        setImage(`https://vsee.onrender.com/${response.data.Profile}`);
       }
       alert('Profile updated!');
     } catch (error) {
