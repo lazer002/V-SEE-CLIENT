@@ -44,7 +44,7 @@ const [selectedFile, setSelectedFile] = useState('');
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:9999/getuser', {
+      const response = await axios.get('https://vsee.onrender.com/getuser', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -80,7 +80,7 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
     try {
 
       const response = await axios.post(
-        'http://localhost:9999/getmessage',
+        'https://vsee.onrender.com/getmessage',
         { receiverId: userId },
         {
           headers: {
@@ -177,7 +177,7 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
           return;
         }
         const response = await axios.post(
-          'http://localhost:9999/searchfriend',
+          'https://vsee.onrender.com/searchfriend',
           { userkey },
           {
             headers: {
@@ -203,7 +203,7 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
     try {
 
       const response = await axios.post(
-        'http://localhost:9999/addfriend',
+        'https://vsee.onrender.com/addfriend',
         { userId },
         {
           headers: {
@@ -300,7 +300,7 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
       <Link to={`/user/${singleUser.username}/${singleUser._id}`}>
         <div className="flex">
 
-          <img src={singleUser.Profile != '' ? `http://localhost:9999/${singleUser.Profile}` : pro} alt="" className='w-10 h-10 rounded-full' />
+          <img src={singleUser.Profile != '' ? `https://vsee.onrender.com/${singleUser.Profile}` : pro} alt="" className='w-10 h-10 rounded-full' />
 
           <div className='px-3 text-2xl text-blue-500 font-medium'>
             {singleUser.username}
@@ -392,7 +392,7 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
                       onClick={chatshow}
                     >
                       <img
-                        src={item.Profile !== '' ? `http://localhost:9999/${item.Profile}` : pro}
+                        src={item.Profile !== '' ? `https://vsee.onrender.com/${item.Profile}` : pro}
                         alt=""
                         className='w-10 h-10 rounded-full'
                         onClick={(e) => e.stopPropagation()}
@@ -428,7 +428,7 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
                       <div key={i} className={`flex ${mg.senderId === selectedUserId ? 'justify-start' : 'justify-end'} gap-2`}>
                         {isNewBlock && mg.senderId === selectedUserId ? (
                           <img
-                            src={singleUser.Profile !== '' ? `http://localhost:9999/${singleUser.Profile}` : pro}
+                            src={singleUser.Profile !== '' ? `https://vsee.onrender.com/${singleUser.Profile}` : pro}
                             alt="User Profile"
                             className="w-10 h-10 rounded-full"
                           />
