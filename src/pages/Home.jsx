@@ -11,6 +11,9 @@ import { FiPhoneCall } from "react-icons/fi";
 import { HiDotsVertical } from "react-icons/hi";
 import pro from '/images/profile.jpeg';
 import EmojiPicker from 'emoji-picker-react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function Home() {
 
@@ -178,7 +181,7 @@ function Home() {
           return;
         }
         const response = await axios.post(
-          'https://vsee.onrender.com/searchfriend',
+          'http://localhost:9999/searchfriend',
           { userkey },
           {
             headers: {
@@ -198,26 +201,40 @@ function Home() {
 
 
   // ###############################  add friend ######################################
-
   const addfriend = async (e) => {
-    const userId = e.target.id
+    const { id, action } = e.currentTarget; 
+    const userId = id.addfrnd;
+    
     try {
-
       const response = await axios.post(
-        'https://vsee.onrender.com/addfriend',
-        { userId },
+        'http://localhost:9999/addfriend', // Same endpoint for both actions
+        { userId, action }, // Pass action in request body
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
+  
+      const responseMessage = response.data.msg;
+  
+      // Update UI based on API response
+      if (responseMessage === 'already') {
+        console.log('Friend request already sent, changing button to Cancel');
+        // Handle UI to show "Cancel" if already sent
+      } else if (responseMessage === 'request canceled') {
+        console.log('Friend request canceled, changing button to Add');
+        // Handle UI to revert back to "Add" button
+      } else if (responseMessage === 'request sent') {
+        console.log('Friend request sent successfully');
+        // Handle UI to show "Cancel" button
+      }
     } catch (error) {
-      console.error('Error cant add user:', error);
-
+      console.error('Error:', error);
     }
-  }
-
+  };
+  
+  
 
 
   const onEmojiClick = (emojiObject) => {
@@ -250,29 +267,32 @@ function Home() {
               />
 
               <div className="absolute z-10 w-full max-w-md bg-white shadow-lg rounded-lg">
-                {results.map((user) => (
-                  <div
-                    key={user.user_id}
-                    className="flex items-center justify-between bg-blue-50 hover:bg-blue-100 border-b border-blue-200 py-3 px-4 rounded-lg mb-2 transition duration-200 ease-in-out"
-                  >
-                    <div className="text-gray-800 font-medium">{user.username}</div>
-                    <div className="flex space-x-3">
-                      <button
-                        className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
-                        onClick={addfriend}
-                        id={user.user_id}
-                      >
-                        <RiCheckFill className="h-5 w-5" />
-                      </button>
-                      <button
-                        className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
-                        id={user.user_id}
-                      >
-                        <RiCloseFill className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+         {results.map((user) => (
+  <div
+    key={user.user_id}
+    className="flex items-center justify-between bg-blue-50 hover:bg-blue-100 border-b border-blue-200 py-3 px-4 rounded-lg mb-2 transition duration-200 ease-in-out"
+  >
+    <div className="text-gray-800 font-medium">{user.username}</div>
+    <div className="flex space-x-3">
+      {user.friend_requests.includes(sessionUser.user_id) ? (
+        <button
+          className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
+          onClick={() => cancelFriendRequest(user.user_id)}
+        >
+          <RiCloseFill className="h-5 w-5" />
+        </button>
+      ) : (
+        <button
+          className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
+          onClick={addfriend}
+        >
+          <RiCheckFill className="h-5 w-5" />
+        </button>
+      )}
+    </div>
+  </div>
+))}
+
               </div>
             </div>
           </div>
@@ -453,6 +473,7 @@ function Home() {
 
         </div>
       </div>
+      <ToastContainer/>
     </>
   );
 // fwafwaf
