@@ -201,24 +201,37 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
   // ###############################  add friend ######################################
 
   const addfriend = async (e) => {
-    const userId = e.target.id
+    const { id, action } = e.currentTarget; 
+    const userId = id.addfrnd;
+    
     try {
-
       const response = await axios.post(
-        'https://vsee.onrender.com/addfriend',
-        { userId },
+        'http://localhost:9999/addfriend', // Same endpoint for both actions
+        { userId, action }, // Pass action in request body
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
+  
+      const responseMessage = response.data.msg;
+  
+      // Update UI based on API response
+      if (responseMessage === 'already') {
+        console.log('Friend request already sent, changing button to Cancel');
+        // Handle UI to show "Cancel" if already sent
+      } else if (responseMessage === 'request canceled') {
+        console.log('Friend request canceled, changing button to Add');
+        // Handle UI to revert back to "Add" button
+      } else if (responseMessage === 'request sent') {
+        console.log('Friend request sent successfully');
+        // Handle UI to show "Cancel" button
+      }
     } catch (error) {
-      console.error('Error cant add user:', error);
-
+      console.error('Error:', error);
     }
-  }
-
+  };
 
 
   const onEmojiClick = (emojiObject) => {
