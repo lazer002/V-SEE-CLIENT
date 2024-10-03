@@ -24,7 +24,7 @@ function Signup() {
   const subData = async (e) => {
     e.preventDefault();
     try {
-        const response = await axios.post('https://vsee.onrender.com/signup', user);
+        const response = await axios.post('http://localhost:9999/signup', user);
         localStorage.setItem('token', response.data.token);
         toast.success("Signup successful!");
         navigate('/signin');
