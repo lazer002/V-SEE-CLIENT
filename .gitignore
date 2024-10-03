@@ -1,3 +1,4 @@
+
 # Logs
 logs
 *.log
@@ -8,11 +9,6 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-<<<<<<< HEAD
-=======
-.env
-env
->>>>>>> 2702a5e73bde8656bbc72398ea82604a31ce7fa4
 dist
 dist-ssr
 *.local
@@ -27,8 +23,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-<<<<<<< HEAD
-=======
-
-.env
->>>>>>> 2702a5e73bde8656bbc72398ea82604a31ce7fa4
