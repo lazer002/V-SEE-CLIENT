@@ -48,7 +48,7 @@ function Home() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:9999/getuser', {
+      const response = await axios.get('https://vsee.onrender.com/getuser', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -180,7 +180,7 @@ function Home() {
           return;
         }
         const response = await axios.post(
-          'http://localhost:9999/searchfriend',
+          'https://vsee.onrender.com/searchfriend',
           { userkey },
           {
             headers: {
@@ -205,7 +205,7 @@ function Home() {
 
     try {
       const response = await axios.post(
-        'http://localhost:9999/addfriend',
+        'https://vsee.onrender.com/addfriend',
         { userId, action },
 
   const addfriend = async (e) => {
@@ -214,7 +214,7 @@ function Home() {
     
     try {
       const response = await axios.post(
-        'http://localhost:9999/addfriend', // Same endpoint for both actions
+        'https://vsee.onrender.com/addfriend', // Same endpoint for both actions
         { userId, action }, // Pass action in request body
 
         {
@@ -236,7 +236,7 @@ function Home() {
   const friendreq = async () => {
        try {
       const response = await axios.get(
-        'http://localhost:9999/friendreq',
+        'https://vsee.onrender.com/friendreq',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -256,7 +256,7 @@ function Home() {
   const acceptFriendRequest = async (fromUserId) => {
     // Call your API to accept the friend request
     try {
-      const response = await axios.post('http://localhost:9999/acceptfriend', { fromUserId });
+      const response = await axios.post('https://vsee.onrender.com/acceptfriend', { fromUserId });
       toast.success(response.data.msg); // Assuming you're using a toast library for notifications
       // Update UI state accordingly
     } catch (error) {
@@ -268,7 +268,7 @@ function Home() {
   const rejectFriendRequest = async (fromUserId) => {
     // Call your API to reject the friend request
     try {
-      const response = await axios.post('http://localhost:9999/rejectfriend', { fromUserId });
+      const response = await axios.post('https://vsee.onrender.com/rejectfriend', { fromUserId });
       toast.success(response.data.msg); // Assuming you're using a toast library for notifications
       // Update UI state accordingly
     } catch (error) {
@@ -278,7 +278,7 @@ function Home() {
   };
   
 
-=======
+
   
       const responseMessage = response.data.msg;
   
