@@ -207,6 +207,16 @@ function Home() {
       const response = await axios.post(
         'http://localhost:9999/addfriend',
         { userId, action },
+
+  const addfriend = async (e) => {
+    const { id, action } = e.currentTarget; 
+    const userId = id.addfrnd;
+    
+    try {
+      const response = await axios.post(
+        'http://localhost:9999/addfriend', // Same endpoint for both actions
+        { userId, action }, // Pass action in request body
+
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -268,7 +278,25 @@ function Home() {
   };
   
 
-
+=======
+  
+      const responseMessage = response.data.msg;
+  
+      // Update UI based on API response
+      if (responseMessage === 'already') {
+        console.log('Friend request already sent, changing button to Cancel');
+        // Handle UI to show "Cancel" if already sent
+      } else if (responseMessage === 'request canceled') {
+        console.log('Friend request canceled, changing button to Add');
+        // Handle UI to revert back to "Add" button
+      } else if (responseMessage === 'request sent') {
+        console.log('Friend request sent successfully');
+        // Handle UI to show "Cancel" button
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   const onEmojiClick = (emojiObject) => {
     setMssg((prevMssg) => prevMssg + emojiObject.emoji);
@@ -359,6 +387,62 @@ function Home() {
               <HiDotsVertical />
             </div>
           </div>
+=======
+         {results.map((user) => (
+  <div
+    key={user.user_id}
+    className="flex items-center justify-between bg-blue-50 hover:bg-blue-100 border-b border-blue-200 py-3 px-4 rounded-lg mb-2 transition duration-200 ease-in-out"
+  >
+    <div className="text-gray-800 font-medium">{user.username}</div>
+    <div className="flex space-x-3">
+      {user.friend_requests.includes(sessionUser.user_id) ? (
+        <button
+          className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
+          onClick={() => cancelFriendRequest(user.user_id)}
+        >
+          <RiCloseFill className="h-5 w-5" />
+        </button>
+      ) : (
+        <button
+          className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
+          onClick={addfriend}
+        >
+          <RiCheckFill className="h-5 w-5" />
+        </button>
+      )}
+    </div>
+  </div>
+))}
+
+              </div>
+            </div>
+          </div>
+
+          <div className="w-3/4 flex justify-between">
+            <div className="chatuser px-5">
+              {singleUser.username ? (
+                <Link to={`/user/${singleUser.username}/${singleUser._id}`}>
+                  <div className="flex">
+                    <img
+                      src={singleUser.Profile ? `https://vsee.onrender.com/${singleUser.Profile}` : pro}
+                      alt=""
+                      className="w-10 h-10 rounded-full"
+                    />
+                    <div className="px-3 text-2xl text-blue-500 font-medium">{singleUser.username}</div>
+                  </div>
+                </Link>
+              ) : (
+                ""
+              )}
+            </div>
+
+            <div className={`flex justify-end gap-7 text-3xl px-3 text-blue-500 ${selectedUserId ? "" : "hidden"}`}>
+              <FiPhoneCall />
+              <RiVideoAddFill />
+              <HiDotsVertical />
+            </div>
+          </div>
+
         </div>
 
         <div className="flex">
@@ -468,6 +552,7 @@ function Home() {
                     </div>
                   </div>
 
+
                   {showPicker && (
                     <div className="emoji-picker-container">
                       <EmojiPicker onEmojiClick={onEmojiClick} />
@@ -535,6 +620,53 @@ function Home() {
         </div>
       </div>
       <ToastContainer />
+=======
+
+                  {showPicker && (
+                    <div className="emoji-picker-container">
+                      <EmojiPicker onEmojiClick={onEmojiClick} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 2 && (
+              <div className="p-4 h-full overflow-y-auto">
+                <div className="w-full">
+                  {results.map((user) => (
+                    <div
+                      key={user.user_id}
+                      className="flex items-center justify-between bg-blue-50 hover:bg-blue-100 border-b border-blue-200 py-3 px-4 rounded-lg mb-2 transition duration-200 ease-in-out"
+                    >
+                      <div className="text-gray-800 font-medium">{user.username}</div>
+                      <div className="flex space-x-3">
+                        <button
+                          className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
+                          onClick={addfriend}
+                          id={user.user_id}
+                        >
+                          <RiCheckFill className="h-5 w-5" />
+                        </button>
+                        <button
+                          className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
+                          id={user.user_id}
+                        >
+                          <RiCloseFill className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+
+        </div>
+      </div>
+      <ToastContainer/>
+
     </>
   );
   // fwafwaf
