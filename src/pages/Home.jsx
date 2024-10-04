@@ -67,7 +67,6 @@ function Home() {
     userdata();
   }, []);
 
-  console.log(sessionUser.email, 'sessionUsersessionUsersessionUser');
 
   // ###############################  chat  show ######################################
 
@@ -201,40 +200,74 @@ function Home() {
 
 
   // ###############################  add friend ######################################
-  const addfriend = async (e) => {
-    const { id, action } = e.currentTarget; 
-    const userId = id.addfrnd;
-    
+  const addfriend = async (userId, isRequestSent) => {
+    const action = isRequestSent ? 'Cancel' : 'Add';
+
     try {
       const response = await axios.post(
-        'http://localhost:9999/addfriend', // Same endpoint for both actions
-        { userId, action }, // Pass action in request body
+        'http://localhost:9999/addfriend',
+        { userId, action },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-  
+
       const responseMessage = response.data.msg;
-  
-      // Update UI based on API response
-      if (responseMessage === 'already') {
-        console.log('Friend request already sent, changing button to Cancel');
-        // Handle UI to show "Cancel" if already sent
-      } else if (responseMessage === 'request canceled') {
-        console.log('Friend request canceled, changing button to Add');
-        // Handle UI to revert back to "Add" button
-      } else if (responseMessage === 'request sent') {
-        console.log('Friend request sent successfully');
-        // Handle UI to show "Cancel" button
-      }
+      toast(responseMessage); // Show toaster message for whatever response is received
     } catch (error) {
-      console.error('Error:', error);
+      toast('An error occurred. Please try again.'); // Show error message
+    }
+  };
+
+
+  // ###############################  show request ######################################
+  const friendreq = async () => {
+       try {
+      const response = await axios.get(
+        'http://localhost:9999/friendreq',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      console.log('response: ', response.data);
+      const responseMessage = response.data.msg;
+      toast(responseMessage); // Show toaster message for whatever response is received
+    } catch (error) {
+      toast('An error occurred. Please try again.'); // Show error message
+    }
+  };
+
+
+  const acceptFriendRequest = async (fromUserId) => {
+    // Call your API to accept the friend request
+    try {
+      const response = await axios.post('http://localhost:9999/acceptfriend', { fromUserId });
+      toast.success(response.data.msg); // Assuming you're using a toast library for notifications
+      // Update UI state accordingly
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+      toast.error('Failed to accept friend request');
     }
   };
   
+  const rejectFriendRequest = async (fromUserId) => {
+    // Call your API to reject the friend request
+    try {
+      const response = await axios.post('http://localhost:9999/rejectfriend', { fromUserId });
+      toast.success(response.data.msg); // Assuming you're using a toast library for notifications
+      // Update UI state accordingly
+    } catch (error) {
+      console.error('Error rejecting friend request:', error);
+      toast.error('Failed to reject friend request');
+    }
+  };
   
+
 
 
   const onEmojiClick = (emojiObject) => {
@@ -267,31 +300,36 @@ function Home() {
               />
 
               <div className="absolute z-10 w-full max-w-md bg-white shadow-lg rounded-lg">
-         {results.map((user) => (
-  <div
-    key={user.user_id}
-    className="flex items-center justify-between bg-blue-50 hover:bg-blue-100 border-b border-blue-200 py-3 px-4 rounded-lg mb-2 transition duration-200 ease-in-out"
-  >
-    <div className="text-gray-800 font-medium">{user.username}</div>
-    <div className="flex space-x-3">
-      {user.friend_requests.includes(sessionUser.user_id) ? (
-        <button
-          className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
-          onClick={() => cancelFriendRequest(user.user_id)}
-        >
-          <RiCloseFill className="h-5 w-5" />
-        </button>
-      ) : (
-        <button
-          className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
-          onClick={addfriend}
-        >
-          <RiCheckFill className="h-5 w-5" />
-        </button>
-      )}
-    </div>
-  </div>
-))}
+                {results.map((user) => {
+                  const hasSentRequest = user.friend_requests.some(
+                    (request) => request.from_user === sessionUser.user_id
+                  );
+
+                  return (
+                    <div
+                      key={user.user_id}
+                      className="flex items-center justify-between bg-blue-50 hover:bg-blue-100 border-b border-blue-200 py-3 px-4 rounded-lg mb-2 transition duration-200 ease-in-out"
+                    >
+                      <div className="text-gray-800 font-medium">{user.username}</div>
+                      <div className="flex space-x-3">
+                        <button
+                          className={`${hasSentRequest ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+                            } text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out`}
+                          onClick={() => addfriend(user.user_id, hasSentRequest)}
+                        >
+                          {hasSentRequest ? (
+                            <RiCloseFill className="h-5 w-5" />
+                          ) : (
+                            <RiCheckFill className="h-5 w-5" />
+                          )}
+                         
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+
+
 
               </div>
             </div>
@@ -440,43 +478,66 @@ function Home() {
             )}
 
             {activeTab === 2 && (
-              <div className="p-4 h-full overflow-y-auto">
-                <div className="w-full">
-                  {results.map((user) => (
-                    <div
-                      key={user.user_id}
-                      className="flex items-center justify-between bg-blue-50 hover:bg-blue-100 border-b border-blue-200 py-3 px-4 rounded-lg mb-2 transition duration-200 ease-in-out"
-                    >
-                      <div className="text-gray-800 font-medium">{user.username}</div>
-                      <div className="flex space-x-3">
+          <div className="p-4 h-full overflow-y-auto">
+          <div className="w-full">
+            {results.map((user) => (
+              <div
+                key={user.user_id}
+                className="flex items-center justify-between bg-blue-50 hover:bg-blue-100 border-b border-blue-200 py-3 px-4 rounded-lg mb-2 transition duration-200 ease-in-out"
+              >
+                <div className="text-gray-800 font-medium">{user.username}</div>
+                <div className="flex space-x-3">
+                  {/* Check if there are friend requests from this user */}
+                  {user.friend_requests && user.friend_requests.length > 0 ? (
+                    user.friend_requests.map((request) => (
+                      <div key={request._id} className="flex space-x-2">
                         <button
                           className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
-                          onClick={addfriend}
-                          id={user.user_id}
+                          onClick={() => acceptFriendRequest(request.from_user)} // Add your accept function
                         >
-                          <RiCheckFill className="h-5 w-5" />
+                          Accept
                         </button>
                         <button
                           className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
-                          id={user.user_id}
+                          onClick={() => rejectFriendRequest(request.from_user)} // Add your reject function
                         >
-                          <RiCloseFill className="h-5 w-5" />
+                          Reject
                         </button>
                       </div>
+                    ))
+                  ) : (
+                    <div className="flex space-x-3">
+                      <button
+                        className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
+                        onClick={addfriend}
+                        id={user.user_id}
+                      >
+                        <RiCheckFill className="h-5 w-5" />
+                      </button>
+                      <button
+                        className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
+                        id={user.user_id}
+                      >
+                        <RiCloseFill className="h-5 w-5" />
+                      </button>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+        
             )}
           </div>
 
 
         </div>
       </div>
-      <ToastContainer/>
+      <ToastContainer />
     </>
   );
-// fwafwaf
+  // fwafwaf
 }
 
 export default Home;
