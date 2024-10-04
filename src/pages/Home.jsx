@@ -1,17 +1,19 @@
 
+
 import axios from 'axios';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import io from 'socket.io-client';
 const socket = io('http://localhost:9999');
 import debounce from 'lodash.debounce'
-import { RiSendPlaneFill, RiEmojiStickerFill, RiAttachment2, RiVideoAddFill,RiMessage3Line, RiUserAddLine, RiGroupLine, RiPieChartLine,RiCheckFill, RiCloseFill } from 'react-icons/ri';
+import { RiSendPlaneFill, RiEmojiStickerFill, RiAttachment2, RiVideoAddFill, RiMessage3Line, RiUserAddLine, RiGroupLine, RiPieChartLine, RiCheckFill, RiCloseFill } from 'react-icons/ri';
 import { FiPhoneCall } from "react-icons/fi";
 import { HiDotsVertical } from "react-icons/hi";
 import pro from '/images/profile.jpeg';
 import EmojiPicker from 'emoji-picker-react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 
 function Home() {
 
@@ -29,12 +31,12 @@ function Home() {
   const token = localStorage.getItem('token');
   const [results, setResults] = useState([]);
   const [showPicker, setShowPicker] = useState(false);
-// firebase
-const [selectedFile, setSelectedFile] = useState('');
-// firebase
+  // firebase
+  const [selectedFile, setSelectedFile] = useState('');
+  // firebase
   const chatBoxRef = useRef(null);
   const attFileRef = useRef(null);
-  const [activeTab, setActiveTab] = useState(1); 
+  const [activeTab, setActiveTab] = useState(1);
 
 
 
@@ -46,7 +48,7 @@ const [selectedFile, setSelectedFile] = useState('');
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://vsee.onrender.com/getuser', {
+      const response = await axios.get('http://localhost:9999/getuser', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -65,7 +67,6 @@ const [selectedFile, setSelectedFile] = useState('');
     userdata();
   }, []);
 
-console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
 
   // ###############################  chat  show ######################################
 
@@ -137,7 +138,7 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
           content: mssg,
           receiverId: selectedUserId,
           senderId: sessionUser.user_id,
-          fileUrl:selectedFile,
+          fileUrl: selectedFile,
           timestamp: new Date(),
         };
 
@@ -179,7 +180,7 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
           return;
         }
         const response = await axios.post(
-          'https://vsee.onrender.com/searchfriend',
+          'http://localhost:9999/searchfriend',
           { userkey },
           {
             headers: {
@@ -199,6 +200,13 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
 
 
   // ###############################  add friend ######################################
+  const addfriend = async (userId, isRequestSent) => {
+    const action = isRequestSent ? 'Cancel' : 'Add';
+
+    try {
+      const response = await axios.post(
+        'http://localhost:9999/addfriend',
+        { userId, action },
 
   const addfriend = async (e) => {
     const { id, action } = e.currentTarget; 
@@ -208,12 +216,69 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
       const response = await axios.post(
         'http://localhost:9999/addfriend', // Same endpoint for both actions
         { userId, action }, // Pass action in request body
+
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
+
+      const responseMessage = response.data.msg;
+      toast(responseMessage); // Show toaster message for whatever response is received
+    } catch (error) {
+      toast('An error occurred. Please try again.'); // Show error message
+    }
+  };
+
+
+  // ###############################  show request ######################################
+  const friendreq = async () => {
+       try {
+      const response = await axios.get(
+        'http://localhost:9999/friendreq',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      console.log('response: ', response.data);
+      const responseMessage = response.data.msg;
+      toast(responseMessage); // Show toaster message for whatever response is received
+    } catch (error) {
+      toast('An error occurred. Please try again.'); // Show error message
+    }
+  };
+
+
+  const acceptFriendRequest = async (fromUserId) => {
+    // Call your API to accept the friend request
+    try {
+      const response = await axios.post('http://localhost:9999/acceptfriend', { fromUserId });
+      toast.success(response.data.msg); // Assuming you're using a toast library for notifications
+      // Update UI state accordingly
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+      toast.error('Failed to accept friend request');
+    }
+  };
+  
+  const rejectFriendRequest = async (fromUserId) => {
+    // Call your API to reject the friend request
+    try {
+      const response = await axios.post('http://localhost:9999/rejectfriend', { fromUserId });
+      toast.success(response.data.msg); // Assuming you're using a toast library for notifications
+      // Update UI state accordingly
+    } catch (error) {
+      console.error('Error rejecting friend request:', error);
+      toast.error('Failed to reject friend request');
+    }
+  };
+  
+
+=======
   
       const responseMessage = response.data.msg;
   
@@ -233,7 +298,6 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
     }
   };
 
-
   const onEmojiClick = (emojiObject) => {
     setMssg((prevMssg) => prevMssg + emojiObject.emoji);
     setShowPicker(false);
@@ -243,7 +307,7 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
 
   // firebase ###############################################
 
-  const uplaodfile = ()=>{
+  const uplaodfile = () => {
     if (attFileRef.current && attFileRef.current.files.length > 0) {
       setSelectedFile(attFileRef.current.files[0]);
     }
@@ -264,6 +328,66 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
               />
 
               <div className="absolute z-10 w-full max-w-md bg-white shadow-lg rounded-lg">
+                {results.map((user) => {
+                  const hasSentRequest = user.friend_requests.some(
+                    (request) => request.from_user === sessionUser.user_id
+                  );
+
+                  return (
+                    <div
+                      key={user.user_id}
+                      className="flex items-center justify-between bg-blue-50 hover:bg-blue-100 border-b border-blue-200 py-3 px-4 rounded-lg mb-2 transition duration-200 ease-in-out"
+                    >
+                      <div className="text-gray-800 font-medium">{user.username}</div>
+                      <div className="flex space-x-3">
+                        <button
+                          className={`${hasSentRequest ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+                            } text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out`}
+                          onClick={() => addfriend(user.user_id, hasSentRequest)}
+                        >
+                          {hasSentRequest ? (
+                            <RiCloseFill className="h-5 w-5" />
+                          ) : (
+                            <RiCheckFill className="h-5 w-5" />
+                          )}
+                         
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+
+
+
+              </div>
+            </div>
+          </div>
+
+          <div className="w-3/4 flex justify-between">
+            <div className="chatuser px-5">
+              {singleUser.username ? (
+                <Link to={`/user/${singleUser.username}/${singleUser._id}`}>
+                  <div className="flex">
+                    <img
+                      src={singleUser.Profile ? `https://vsee.onrender.com/${singleUser.Profile}` : pro}
+                      alt=""
+                      className="w-10 h-10 rounded-full"
+                    />
+                    <div className="px-3 text-2xl text-blue-500 font-medium">{singleUser.username}</div>
+                  </div>
+                </Link>
+              ) : (
+                ""
+              )}
+            </div>
+
+            <div className={`flex justify-end gap-7 text-3xl px-3 text-blue-500 ${selectedUserId ? "" : "hidden"}`}>
+              <FiPhoneCall />
+              <RiVideoAddFill />
+              <HiDotsVertical />
+            </div>
+          </div>
+=======
          {results.map((user) => (
   <div
     key={user.user_id}
@@ -318,6 +442,7 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
               <HiDotsVertical />
             </div>
           </div>
+
         </div>
 
         <div className="flex">
@@ -427,6 +552,76 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
                     </div>
                   </div>
 
+
+                  {showPicker && (
+                    <div className="emoji-picker-container">
+                      <EmojiPicker onEmojiClick={onEmojiClick} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 2 && (
+          <div className="p-4 h-full overflow-y-auto">
+          <div className="w-full">
+            {results.map((user) => (
+              <div
+                key={user.user_id}
+                className="flex items-center justify-between bg-blue-50 hover:bg-blue-100 border-b border-blue-200 py-3 px-4 rounded-lg mb-2 transition duration-200 ease-in-out"
+              >
+                <div className="text-gray-800 font-medium">{user.username}</div>
+                <div className="flex space-x-3">
+                  {/* Check if there are friend requests from this user */}
+                  {user.friend_requests && user.friend_requests.length > 0 ? (
+                    user.friend_requests.map((request) => (
+                      <div key={request._id} className="flex space-x-2">
+                        <button
+                          className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
+                          onClick={() => acceptFriendRequest(request.from_user)} // Add your accept function
+                        >
+                          Accept
+                        </button>
+                        <button
+                          className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
+                          onClick={() => rejectFriendRequest(request.from_user)} // Add your reject function
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex space-x-3">
+                      <button
+                        className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
+                        onClick={addfriend}
+                        id={user.user_id}
+                      >
+                        <RiCheckFill className="h-5 w-5" />
+                      </button>
+                      <button
+                        className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out"
+                        id={user.user_id}
+                      >
+                        <RiCloseFill className="h-5 w-5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+            )}
+          </div>
+
+
+        </div>
+      </div>
+      <ToastContainer />
+=======
+
                   {showPicker && (
                     <div className="emoji-picker-container">
                       <EmojiPicker onEmojiClick={onEmojiClick} />
@@ -471,10 +666,11 @@ console.log(sessionUser.email,'sessionUsersessionUsersessionUser');
         </div>
       </div>
       <ToastContainer/>
+
     </>
   );
+  // fwafwaf
 }
 
 export default Home;
 
-// 
