@@ -200,15 +200,16 @@ function Home() {
 
 
   // ###############################  add friend ######################################
-  const addfriend = async (userId, isRequestSent) => {
+  const addfriend = async (a, isRequestSent) => {
+console.log('✌️isRequestSent --->', isRequestSent,a);
+    
     const action = isRequestSent ? 'Cancel' : 'Add';
 
-    const userId = id.addfrnd;
 
     try {
       const response = await axios.post(
         'https://vsee.onrender.com/addfriend', // Same endpoint for both actions
-        { userId, action }, // Pass action in request body
+        { a, action }, // Pass action in request body
 
         {
           headers: {
