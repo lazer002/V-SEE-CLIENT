@@ -13,7 +13,7 @@ const FriendTabs = () => {
     const fetchFriendRequests = async () => {
       try {
         const response = await axios.get(
-          'http://localhost:9999/friend-requests',
+          'https://vsee.onrender.com/friend-requests',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -30,7 +30,7 @@ const FriendTabs = () => {
     const fetchFriends = async () => {
       try {
         const response = await axios.get(
-          'http://localhost:9999/friends',
+          'https://vsee.onrender.com/friends',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -55,7 +55,7 @@ const FriendTabs = () => {
   
 console.log(fromUserId,'fromUserId');
     try {
-      const response = await axios.post('http://localhost:9999/acceptfriend', {
+      const response = await axios.post('https://vsee.onrender.com/acceptfriend', {
         from_user_id: fromUserId
       } , {
         headers: {
@@ -74,7 +74,7 @@ console.log(fromUserId,'fromUserId');
     const userId = localStorage.getItem('user_id'); // Get current user's ID
 
     try {
-      const response = await axios.post('http://localhost:9999/rejectfriend', {
+      const response = await axios.post('https://vsee.onrender.com/rejectfriend', {
         from_user_id: fromUserId
       } , {
         headers: {
