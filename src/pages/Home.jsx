@@ -50,7 +50,7 @@ function Home() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:9999/getuser', {
+      const response = await axios.get('https://vsee.onrender.com/getuser', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -85,7 +85,7 @@ function Home() {
     try {
 
       const response = await axios.post(
-        'http://localhost:9999/getmessage',
+        'https://vsee.onrender.com/getmessage',
         { receiverId: userId },
         {
           headers: {
@@ -182,7 +182,7 @@ function Home() {
           return;
         }
         const response = await axios.post(
-          'http://localhost:9999/searchfriend',
+          'https://vsee.onrender.com/searchfriend',
           { userkey },
           {
             headers: {
@@ -209,7 +209,7 @@ function Home() {
 
     try {
       const response = await axios.post(
-        'http://localhost:9999/addfriend', // Same endpoint for both actions
+        https://vsee.onrender.com/addfriend', // Same endpoint for both actions
         { a, action }, // Pass action in request body
 
         {
