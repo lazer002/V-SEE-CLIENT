@@ -13,6 +13,7 @@ import pro from '/images/profile.jpeg';
 import EmojiPicker from 'emoji-picker-react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import FriendRequest from '../components/FriendRequest';
 
 
 function Home() {
@@ -37,6 +38,7 @@ function Home() {
   const chatBoxRef = useRef(null);
   const attFileRef = useRef(null);
   const [activeTab, setActiveTab] = useState(1);
+  const [fromUserDetails, setFromUserDetails] = useState([]);
 
 
 
@@ -48,7 +50,7 @@ function Home() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://vsee.onrender.com/getuser', {
+      const response = await axios.get('http://localhost:9999/getuser', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -83,7 +85,7 @@ function Home() {
     try {
 
       const response = await axios.post(
-        'https://vsee.onrender.com/getmessage',
+        'http://localhost:9999/getmessage',
         { receiverId: userId },
         {
           headers: {
@@ -180,7 +182,7 @@ function Home() {
           return;
         }
         const response = await axios.post(
-          'https://vsee.onrender.com/searchfriend',
+          'http://localhost:9999/searchfriend',
           { userkey },
           {
             headers: {
@@ -201,14 +203,13 @@ function Home() {
 
   // ###############################  add friend ######################################
   const addfriend = async (a, isRequestSent) => {
-console.log('✌️isRequestSent --->', isRequestSent,a);
     
     const action = isRequestSent ? 'Cancel' : 'Add';
 
 
     try {
       const response = await axios.post(
-        'https://vsee.onrender.com/addfriend', // Same endpoint for both actions
+        'http://localhost:9999/addfriend', // Same endpoint for both actions
         { a, action }, // Pass action in request body
 
         {
@@ -217,7 +218,6 @@ console.log('✌️isRequestSent --->', isRequestSent,a);
           },
         }
       );
-
       const responseMessage = response.data.msg;
       toast(responseMessage); // Show toaster message for whatever response is received
     } catch (error) {
@@ -227,49 +227,9 @@ console.log('✌️isRequestSent --->', isRequestSent,a);
 
 
   // ###############################  show request ######################################
-  const friendreq = async () => {
-    try {
-      const response = await axios.get(
-        'https://vsee.onrender.com/friendreq',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log('response: ', response.data);
-      const responseMessage = response.data.msg;
-      toast(responseMessage); // Show toaster message for whatever response is received
-    } catch (error) {
-      toast('An error occurred. Please try again.'); // Show error message
-    }
-  };
 
 
-  const acceptFriendRequest = async (fromUserId) => {
-    // Call your API to accept the friend request
-    try {
-      const response = await axios.post('https://vsee.onrender.com/acceptfriend', { fromUserId });
-      toast.success(response.data.msg); // Assuming you're using a toast library for notifications
-      // Update UI state accordingly
-    } catch (error) {
-      console.error('Error accepting friend request:', error);
-      toast.error('Failed to accept friend request');
-    }
-  };
 
-  const rejectFriendRequest = async (fromUserId) => {
-    // Call your API to reject the friend request
-    try {
-      const response = await axios.post('https://vsee.onrender.com/rejectfriend', { fromUserId });
-      toast.success(response.data.msg); // Assuming you're using a toast library for notifications
-      // Update UI state accordingly
-    } catch (error) {
-      console.error('Error rejecting friend request:', error);
-      toast.error('Failed to reject friend request');
-    }
-  };
 
 
 
@@ -304,31 +264,36 @@ console.log('✌️isRequestSent --->', isRequestSent,a);
               placeholder="Search for friends"
               className="p-2 w-10/12 rounded-lg shadow-sm"
             />
-            <div className="absolute z-10 w-full max-w-md bg-white shadow-lg rounded-lg">
-              {results.map((user) => {
-                const hasSentRequest = user.friend_requests.some(
-                  (request) => request.from_user === sessionUser.user_id
-                );
-                return (
-                  <div
-                    key={user.user_id}
-                    className="flex items-center justify-between bg-blue-50 hover:bg-blue-100 border-b border-blue-200 py-3 px-4 rounded-lg mb-2 transition duration-200 ease-in-out"
-                  >
-                    <div className="text-gray-800 font-medium">{user.username}</div>
-                    <div className="flex space-x-3">
-                      <button
-                        className={`${
-                          hasSentRequest ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
-                        } text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out`}
-                        onClick={() => addfriend(user.user_id, hasSentRequest)}
-                      >
-                        {hasSentRequest ? <RiCloseFill className="h-5 w-5" /> : <RiCheckFill className="h-5 w-5" />}
-                      </button>
+          <div className="absolute z-10 w-full max-w-md bg-white shadow-lg rounded-lg">
+                {results.map((user) => {
+                  const hasSentRequest = user.friend_requests.some(
+                    (request) => request.from_user === sessionUser.user_id
+                  );
+
+                  return (
+                    <div
+                      key={user.user_id}
+                      className="flex items-center justify-between bg-blue-50 hover:bg-blue-100 border-b border-blue-200 py-3 px-4 rounded-lg mb-2 transition duration-200 ease-in-out"
+                    >
+                      <div className="text-gray-800 font-medium">{user.username}</div>
+                      <div className="flex space-x-3">
+                        <button
+                          className={`${hasSentRequest ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+                            } text-white p-2 rounded-full shadow-md transition duration-200 ease-in-out`}
+                          onClick={() => addfriend(user.user_id, hasSentRequest)}
+                        >
+                          {hasSentRequest ? (
+                            <RiCloseFill className="h-5 w-5" />
+                          ) : (
+                            <RiCheckFill className="h-5 w-5" />
+                          )}
+                         
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+             </div>
           </div>
         </div>
   
@@ -338,7 +303,7 @@ console.log('✌️isRequestSent --->', isRequestSent,a);
               <Link to={`/user/${singleUser.username}/${singleUser._id}`}>
                 <div className="flex">
                   <img
-                    src={singleUser.Profile ? `https://vsee.onrender.com/${singleUser.Profile}` : pro}
+                    src={singleUser.Profile ? `http://localhost:9999/${singleUser.Profile}` : pro}
                     alt=""
                     className="w-10 h-10 rounded-full"
                   />
@@ -361,7 +326,7 @@ console.log('✌️isRequestSent --->', isRequestSent,a);
           <div className={`p-4 ${activeTab === 1 ? "bg-blue-400 text-white" : "text-gray-600"}`} onClick={() => setActiveTab(1)}>
             <RiMessage3Line size={24} />
           </div>
-          <div className={`p-4 ${activeTab === 2 ? "bg-blue-400 text-white" : "text-gray-600"}`} onClick={() => setActiveTab(2)}>
+          <div className={`p-4 ${activeTab === 2 ? "bg-blue-400 text-white" : "text-gray-600"}`} onClick={() => {setActiveTab(2)}}>
             <RiUserAddLine size={24} />
           </div>
           <div className={`p-4 ${activeTab === 3 ? "bg-blue-400 text-white" : "text-gray-600"}`} onClick={() => setActiveTab(3)}>
@@ -395,7 +360,7 @@ console.log('✌️isRequestSent --->', isRequestSent,a);
                       onClick={chatshow}
                     >
                       <img
-                        src={item.Profile ? `https://vsee.onrender.com/${item.Profile}` : pro}
+                        src={item.Profile ? `http://localhost:9999/${item.Profile}` : pro}
                         alt="User Profile"
                         className="w-10 h-10 rounded-full"
                       />
@@ -415,7 +380,7 @@ console.log('✌️isRequestSent --->', isRequestSent,a);
                       <div key={i} className={`flex ${mg.senderId === selectedUserId ? "justify-start" : "justify-end"} gap-2`}>
                         {isNewBlock && mg.senderId === selectedUserId ? (
                           <img
-                            src={singleUser.Profile ? `https://vsee.onrender.com/${singleUser.Profile}` : pro}
+                            src={singleUser.Profile ? `http://localhost:9999/${singleUser.Profile}` : pro}
                             alt="User Profile"
                             className="w-10 h-10 rounded-full"
                           />
@@ -477,26 +442,7 @@ console.log('✌️isRequestSent --->', isRequestSent,a);
           )}
   
           {activeTab === 2 && (
-            <div className="p-4 h-full overflow-y-auto">
-              <div className="w-full">
-                {results.map((user) => (
-                  <div
-                    key={user.user_id}
-                    className="flex items-center justify-between bg-blue-50 hover:bg-blue-100 border-b border-blue-200 py-3 px-4 rounded-lg mb-2 transition duration-200 ease-in-out"
-                  >
-                    <div className="text-gray-800 font-medium">{user.username}</div>
-                    <div className="flex space-x-3">
-                      <button className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-md">
-                        <RiCheckFill className="h-5 w-5" />
-                      </button>
-                      <button className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-md">
-                        <RiCloseFill className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+   <FriendRequest/>
           )}
   
           {activeTab === 3 && <div>Group Tab Content</div>}
