@@ -4,7 +4,7 @@ import axios from 'axios';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import io from 'socket.io-client';
-const socket = io('http://localhost:9999');
+const socket = io('https://vsee.onrender.com');
 import debounce from 'lodash.debounce'
 import { RiSendPlaneFill, RiEmojiStickerFill, RiAttachment2, RiVideoAddFill, RiMessage3Line, RiUserAddLine, RiGroupLine, RiPieChartLine, RiCheckFill, RiCloseFill } from 'react-icons/ri';
 import { FiPhoneCall } from "react-icons/fi";
