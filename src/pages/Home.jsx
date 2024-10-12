@@ -209,7 +209,7 @@ function Home() {
 
     try {
       const response = await axios.post(
-        https://vsee.onrender.com/addfriend', // Same endpoint for both actions
+        'https://vsee.onrender.com/addfriend', // Same endpoint for both actions
         { a, action }, // Pass action in request body
 
         {
