@@ -357,6 +357,7 @@ function Home() {
                     <div
                       className="py-5 ps-5 my-2 rounded-lg bg-blue-300 border-b border-blue-50 shadow-sm flex"
                       key={item.user_id}
+                      id={item.user_id}
                       onClick={chatshow}
                     >
                       <img
