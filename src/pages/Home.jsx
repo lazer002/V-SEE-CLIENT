@@ -1,12 +1,13 @@
 
-
 import axios from 'axios';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import io from 'socket.io-client';
 const server_mode = import.meta.env.MODE
 const API = server_mode=='development' ? 'http://localhost:9999' : 'https://vsee.onrender.com'
-const socket = io(`${API}`);
+
+const socket = io(API);
+// const socket = io(`http://localhost:9999`);
 import debounce from 'lodash.debounce'
 import { RiSendPlaneFill, RiEmojiStickerFill, RiAttachment2, RiVideoAddFill, RiMessage3Line, RiUserAddLine, RiGroupLine, RiPieChartLine, RiCheckFill, RiCloseFill } from 'react-icons/ri';
 import { FiPhoneCall } from "react-icons/fi";
@@ -146,7 +147,6 @@ function Home() {
           timestamp: new Date(),
         };
 
-        console.log('newMessage: ', newMessage);
         socket.emit('sendMessage', newMessage);
 
 
@@ -366,8 +366,9 @@ function Home() {
                         src={item.Profile ? `${API}/${item.Profile}` : pro}
                         alt="User Profile"
                         className="w-10 h-10 rounded-full"
+                        id={item.user_id}
                       />
-                      <div className="font-medium text-gray-800 ps-4 text-lg">{item.username}</div>
+                      <div className="font-medium text-gray-800 ps-4 text-lg"  id={item.user_id}>{item.username}</div>
                     </div>
                   ))
                 )}
