@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { RiCheckFill, RiCloseFill } from 'react-icons/ri';
-import { toast } from 'react-toastify';
+import { toast , ToastContainer} from 'react-toastify';
 const server_mode = import.meta.env.MODE
 const API = server_mode=='development' ? 'http://localhost:9999' : 'https://vsee.onrender.com'
 
@@ -11,6 +11,47 @@ const FriendTabs = () => {
   const [fromUserDetails, setFromUserDetails] = useState([]);
   const [friends, setFriends] = useState([]);
   const token = localStorage.getItem('token');
+
+ 
+  const acceptFriendRequest = async (fromUserId) => {
+  
+
+    try {
+      const response = await axios.post(`${API}/acceptfriend`, {
+        from_user_id: fromUserId
+      } , {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log('response.data.msg: ', response.data.msg);
+      toast.success(response.data.msg);
+      // Update UI state to reflect acceptance
+      setFromUserDetails(prev => prev.filter(user => user.from_user !== fromUserId));
+    } catch (error) {
+      toast.error('Failed to accept friend request');
+    }
+  };
+
+  const rejectFriendRequest = async (fromUserId) => {
+    const userId = localStorage.getItem('user_id'); // Get current user's ID
+
+    try {
+      const response = await axios.post(`${API}/rejectfriend`, {
+        from_user_id: fromUserId
+      } , {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      toast.success(response.data.msg);
+      // Update UI state to reflect rejection
+      setFromUserDetails(prev => prev.filter(user => user.from_user !== fromUserId));
+    } catch (error) {
+      toast.error('Failed to reject friend request');
+    }
+  };
+  
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
@@ -52,47 +93,17 @@ const FriendTabs = () => {
     } else if (activeTab === 'friends') {
       fetchFriends();
     }
-  }, [activeTab, token]);
+  }, [activeTab, token,acceptFriendRequest]);
 
-  const acceptFriendRequest = async (fromUserId) => {
-  
-console.log(fromUserId,'fromUserId');
-    try {
-      const response = await axios.post(`${API}/acceptfriend`, {
-        from_user_id: fromUserId
-      } , {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      toast.success(response.data.msg);
-      // Update UI state to reflect acceptance
-      setFromUserDetails(prev => prev.filter(user => user.from_user !== fromUserId));
-    } catch (error) {
-      toast.error('Failed to accept friend request');
-    }
-  };
 
-  const rejectFriendRequest = async (fromUserId) => {
-    const userId = localStorage.getItem('user_id'); // Get current user's ID
 
-    try {
-      const response = await axios.post(`${API}/rejectfriend`, {
-        from_user_id: fromUserId
-      } , {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      toast.success(response.data.msg);
-      // Update UI state to reflect rejection
-      setFromUserDetails(prev => prev.filter(user => user.from_user !== fromUserId));
-    } catch (error) {
-      toast.error('Failed to reject friend request');
-    }
-  };
+
+
+
   return (
+    
     <div className="w-full mx-auto my-8 p-4 bg-white shadow-lg rounded-lg">
+         <ToastContainer/>
       <div className="flex justify-evenly mb-4 border-b border-gray-200">
         <button
           onClick={() => setActiveTab('requests')}
