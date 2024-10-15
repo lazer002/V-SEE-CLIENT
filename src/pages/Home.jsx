@@ -300,6 +300,7 @@ function Home() {
         </div>
   
         <div className="w-3/4 flex justify-between">
+        {sessionUser.email}
           <div className="chatuser px-5">
             {singleUser.username && (
               <Link to={`/user/${singleUser.username}/${singleUser._id}`}>
@@ -339,6 +340,7 @@ function Home() {
           </div>
           <Link to={`/user/${sessionUser.email}/${sessionUser._id}`}>
             <img src={pro} className="h-9 w-9 rounded-full border border-gray-500 fixed bottom-5 left-4" />
+          
           </Link>
         </div>
   

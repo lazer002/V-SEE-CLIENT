@@ -81,7 +81,7 @@ const FriendTabs = () => {
             },
           }
         );
-        setFriends(response.data.friends);
+        setFriends(response.data.Frequests);
         toast(response.data.msg);
       } catch (error) {
         toast('An error occurred. Please try again.');
@@ -93,7 +93,7 @@ const FriendTabs = () => {
     } else if (activeTab === 'friends') {
       fetchFriends();
     }
-  }, [activeTab, token,acceptFriendRequest]);
+  }, [activeTab, token]);
 
 
 
@@ -165,8 +165,8 @@ const FriendTabs = () => {
                     <p className="text-sm text-gray-500"><strong>Email:</strong> {friend?.email || 'N/A'}</p>
                   </div>
                   <button
-                    onClick={() => removeFriend(friend.user_id)} // Implement removeFriend function as needed
-                    className="flex items-center justify-center w-10 h-10 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    onClick={() => removeFriend(friend.user_id)} 
+                    className="flex items-center justify-center p-3 bg-red-500 text-white rounded-lg hover:bg-red-600"
                   >
                     Remove
                   </button>
