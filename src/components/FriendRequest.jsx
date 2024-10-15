@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { RiCheckFill, RiCloseFill } from 'react-icons/ri';
 import { toast } from 'react-toastify';
+const server_mode = import.meta.env.MODE
+const API = server_mode=='development' ? 'http://localhost:9999' : 'https://vsee.onrender.com'
+
 
 const FriendTabs = () => {
   const [activeTab, setActiveTab] = useState('requests');
@@ -13,7 +16,7 @@ const FriendTabs = () => {
     const fetchFriendRequests = async () => {
       try {
         const response = await axios.get(
-          'https://vsee.onrender.com/friend-requests',
+          `${API}/friend-requests`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -30,7 +33,7 @@ const FriendTabs = () => {
     const fetchFriends = async () => {
       try {
         const response = await axios.get(
-          'https://vsee.onrender.com/friends',
+          `${API}/friends`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -55,7 +58,7 @@ const FriendTabs = () => {
   
 console.log(fromUserId,'fromUserId');
     try {
-      const response = await axios.post('https://vsee.onrender.com/acceptfriend', {
+      const response = await axios.post(`${API}/acceptfriend`, {
         from_user_id: fromUserId
       } , {
         headers: {
@@ -74,7 +77,7 @@ console.log(fromUserId,'fromUserId');
     const userId = localStorage.getItem('user_id'); // Get current user's ID
 
     try {
-      const response = await axios.post('https://vsee.onrender.com/rejectfriend', {
+      const response = await axios.post(`${API}/rejectfriend`, {
         from_user_id: fromUserId
       } , {
         headers: {
@@ -88,10 +91,9 @@ console.log(fromUserId,'fromUserId');
       toast.error('Failed to reject friend request');
     }
   };
-console.log(fromUserDetails,'fromUserDetails');
   return (
     <div className="w-full mx-auto my-8 p-4 bg-white shadow-lg rounded-lg">
-      <div className="flex justify-between mb-4 border-b border-gray-200">
+      <div className="flex justify-evenly mb-4 border-b border-gray-200">
         <button
           onClick={() => setActiveTab('requests')}
           className={`px-4 py-2 font-semibold ${activeTab === 'requests' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-600'}`}

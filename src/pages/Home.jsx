@@ -4,7 +4,9 @@ import axios from 'axios';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import io from 'socket.io-client';
-const socket = io('https://vsee.onrender.com');
+const server_mode = import.meta.env.MODE
+const API = server_mode=='development' ? 'http://localhost:9999' : 'https://vsee.onrender.com'
+const socket = io(`${API}`);
 import debounce from 'lodash.debounce'
 import { RiSendPlaneFill, RiEmojiStickerFill, RiAttachment2, RiVideoAddFill, RiMessage3Line, RiUserAddLine, RiGroupLine, RiPieChartLine, RiCheckFill, RiCloseFill } from 'react-icons/ri';
 import { FiPhoneCall } from "react-icons/fi";
@@ -42,7 +44,6 @@ function Home() {
 
 
 
-
   // ###############################  friend list ######################################
 
 
@@ -50,7 +51,7 @@ function Home() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://vsee.onrender.com/getuser', {
+      const response = await axios.get(`${API}/getuser`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -85,7 +86,7 @@ function Home() {
     try {
 
       const response = await axios.post(
-        'https://vsee.onrender.com/getmessage',
+        `${API}/getmessage`,
         { receiverId: userId },
         {
           headers: {
@@ -103,6 +104,7 @@ function Home() {
 
   useEffect(() => {
     socket.on('receiveMessage', (incomingMessage) => {
+      
       if (incomingMessage.senderId !== sessionUser.user_id || incomingMessage.receiverId === selectedUserId) {
         setMessage(prevMessages => [...prevMessages, incomingMessage]);
       }
@@ -182,7 +184,7 @@ function Home() {
           return;
         }
         const response = await axios.post(
-          'https://vsee.onrender.com/searchfriend',
+        `${API}/searchfriend`,
           { userkey },
           {
             headers: {
@@ -209,7 +211,7 @@ function Home() {
 
     try {
       const response = await axios.post(
-        'https://vsee.onrender.com/addfriend',
+        `${API}/addfriend`,
         { a, action },
 
         {
@@ -303,7 +305,7 @@ function Home() {
               <Link to={`/user/${singleUser.username}/${singleUser._id}`}>
                 <div className="flex">
                   <img
-                    src={singleUser.Profile ? `http://localhost:9999/${singleUser.Profile}` : pro}
+                    src={singleUser.Profile ? `${API}/${singleUser.Profile}` : pro}
                     alt=""
                     className="w-10 h-10 rounded-full"
                   />
@@ -361,7 +363,7 @@ function Home() {
                       onClick={chatshow}
                     >
                       <img
-                        src={item.Profile ? `http://localhost:9999/${item.Profile}` : pro}
+                        src={item.Profile ? `${API}/${item.Profile}` : pro}
                         alt="User Profile"
                         className="w-10 h-10 rounded-full"
                       />
@@ -381,7 +383,7 @@ function Home() {
                       <div key={i} className={`flex ${mg.senderId === selectedUserId ? "justify-start" : "justify-end"} gap-2`}>
                         {isNewBlock && mg.senderId === selectedUserId ? (
                           <img
-                            src={singleUser.Profile ? `http://localhost:9999/${singleUser.Profile}` : pro}
+                            src={singleUser.Profile ? `${API}/${singleUser.Profile}` : pro}
                             alt="User Profile"
                             className="w-10 h-10 rounded-full"
                           />

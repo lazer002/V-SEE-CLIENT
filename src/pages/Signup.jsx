@@ -8,6 +8,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { RiGoogleFill } from 'react-icons/ri';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+const server_mode = import.meta.env.MODE
+const API = server_mode=='development' ? 'http://localhost:9999' : 'https://vsee.onrender.com'
+
 
 function Signup() {
   const navigate = useNavigate();
@@ -24,7 +27,7 @@ function Signup() {
   const subData = async (e) => {
     e.preventDefault();
     try {
-        const response = await axios.post('https://vsee.onrender.com/signup', user);
+        const response = await axios.post(`${API}/signup`, user);
         localStorage.setItem('token', response.data.token);
         toast.success("Signup successful!");
         navigate('/signin');
@@ -34,7 +37,7 @@ function Signup() {
 }
 
   const googleAuth = () => {
-    window.location.href = 'https://vsee.onrender.com/auth/google/';
+    window.location.href = '${API}/auth/google/';
   };
 
   return (
@@ -94,13 +97,13 @@ function Signup() {
           Already have an account? <Link to="/signin" className="font-medium text-blue-600 hover:text-blue-500">Sign In</Link>
         </p>
         <div className="mt-6 flex flex-col items-center">
-          <button
+          {/* <button
             onClick={googleAuth}
             className="w-full flex items-center justify-center bg-gray-200 text-gray-800 py-2 px-4 rounded-lg shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
             <RiGoogleFill className="w-5 h-5 mr-2" />
             Sign Up with Google
-          </button>
+          </button> */}
         </div>
       </div>
       <ToastContainer/>

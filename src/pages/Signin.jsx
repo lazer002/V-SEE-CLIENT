@@ -6,6 +6,9 @@ import { AuthContext } from '../AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+const server_mode = import.meta.env.MODE
+const API = server_mode=='development' ? 'http://localhost:9999' : 'https://vsee.onrender.com'
+
 
 function Signin() {
   const navigate = useNavigate();
@@ -20,7 +23,7 @@ function Signin() {
   const postData = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('https://vsee.onrender.com/signin', user);
+      const response = await axios.post(`${API}/signin`, user);
       if (response.status === 200) {
         localStorage.setItem('token', response.data.token);
         login(response.data.token);
