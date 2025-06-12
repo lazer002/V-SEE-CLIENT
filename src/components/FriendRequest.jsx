@@ -51,7 +51,22 @@ const FriendTabs = () => {
       toast.error('Failed to reject friend request');
     }
   };
-  
+   const removeFriend = async (friendUserId) => {
+  try {
+    const response = await axios.post(`${API}/removefriend`, {
+      friend_user_id: friendUserId
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    toast.success(response.data.msg);
+    setFriends(prev => prev.filter(friend => friend.user_id !== friendUserId));
+  } catch (error) {
+    toast.error('Failed to remove friend');
+  }
+};
+
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
